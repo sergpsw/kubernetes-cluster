@@ -2,12 +2,12 @@
  - https://www.virtualbox.org/wiki/Linux_Downloads
  - https://www.vagrantup.com/intro/getting-started
 
-2. Clone the repository "change link" to your machine in any folder. Open a terminal in this folder.
+2. Clone the repository "https://github.com/sergpsw/kubernetes-cluster" to your machine in any folder. Open folder "ansible_guest" or "ansible_host" and run terminal.
 
-4. Run the command 'vagrant up'. 
+3. Run the command 'vagrant up'. 
 
-5. Wait the virtual machines starts up. Upon completion of all the above steps, the Kubernetes cluster should be up and running:
+4. Wait the virtual machines starts up. Upon completion of all the above steps, the Kubernetes cluster should be up and running:
  - 'vagrant ssh masterk8s' - can login to the master nodes
  - 'vagrant ssh workerk8s1' - can login to the worker nodes
- - http://192.168.88.101:31111/ - open in the browser webserver Nginx.
-
+ - http://192.168.88.101:31111/ - open in the browser webserver Nginx (NodePort)
+ - http://192.168.88.101:80 - open in the browser webserver Nginx (Ingress)

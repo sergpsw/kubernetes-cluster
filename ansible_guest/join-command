@@ -1,0 +1,1 @@
+kubeadm join 192.168.88.100:6443 --token u8sltf.hhw922wja91sj9ks     --discovery-token-ca-cert-hash sha256:b5455c535d1fad7f57ddeadb2cb5beebad30df688bd034d58849843ae419b730 

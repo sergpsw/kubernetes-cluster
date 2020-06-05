@@ -1,0 +1,13 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: Brake if OS non Debian or RedHat family
+    fail: msg="Sorry, not works for this OS family!"
+    when: ansible_os_family != "Debian" and ansible_os_family != "RedHat"
+
+- import_playbook: ./playbook-masterkube.yml
+- import_playbook: ./playbook-workerkube.yml
+- import_playbook: ./playbook-join-m.yml
+- import_playbook: ./playbook-join-w.yml
+- import_playbook: ./playbook-manifests.yml

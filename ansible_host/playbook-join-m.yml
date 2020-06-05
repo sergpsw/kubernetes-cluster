@@ -1,0 +1,27 @@
+---
+- hosts: masterk8s
+  become: yes
+
+  vars:
+    src: /var/www/vagrant/
+    dest: /home/vagrant/
+
+  tasks:
+    - name: Copy manifest-files
+      copy: src={{ src }}{{ item }} dest={{ dest }} remote_src=yes owner=vagrant
+      loop:
+      - "nginx-deployment.yml"
+      - "nginx-ingress.yml"
+
+    - name: Restart kubelet
+      service:
+        name: kubelet
+        daemon_reload: yes
+        state: restarted
+
+    - name: Generate join command
+      shell: kubeadm token create --print-join-command
+      register: join_command
+
+    - name: Copy join command to local file
+      local_action: copy content="{{ join_command.stdout_lines[0] }}" dest="./join-command"

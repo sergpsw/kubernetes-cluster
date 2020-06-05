@@ -4,12 +4,12 @@ set -e
 
 if [[ "ls -a  /etc/debian_version" ]]
   then
-    if [[ "ls -a /etc | grep python2" || "ls -a /etc | grep python3" ]]
+    if [[ "ls -a /etc | grep python3" ]]
       then
         echo "Python Ok"
       else
         apt-get update
-        apt-get install python -y
+        apt-get install python3.6 -y
     fi
     if [[ "ls -a /etc | grep ansible" ]]
       then
@@ -21,13 +21,13 @@ if [[ "ls -a  /etc/debian_version" ]]
         apt install ansible -y
     fi
   else
-    if [[ "ls -a /etc | grep python2" || "ls -a /etc | grep python3"  ]]
+    if [[ "ls -a /etc | grep python3"  ]]
       then
         echo "Python Ok"
       else
         yum install epel-release -y
         yum update -y
-        yum install python -y
+        yum install python3.6 -y
     fi
     if [[ "ls -a /etc | grep ansible"  ]]
       then

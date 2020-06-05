@@ -1,0 +1,10 @@
+---
+- hosts: masterk8s
+  become: yes
+  tasks:
+    - name: Install my pods
+      become: false
+      shell: kubectl apply -f nginx-deployment.yml -f nginx-ingress.yml
+    # when: 
+    # - ansible_nodename == "masternode"
+    # - ansible_nodename == "workernode1" 

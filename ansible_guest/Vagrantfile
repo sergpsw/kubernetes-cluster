@@ -6,7 +6,7 @@ Vagrant.configure("2") do |config|
     masterk8s.vm.box = "ubuntu/bionic64"
     masterk8s.vm.hostname = "masternode"
     masterk8s.vm.network "private_network", ip: "192.168.88.100"
-    masterk8s.vm.synced_folder "./", "/var/www/vagrant"
+    masterk8s.vm.synced_folder "../", "/var/www/vagrant"
     masterk8s.vm.provision "ansible_local" do |ansible|
       ansible.playbook = "playbook-masterkube.yml"
       ansible.extra_vars = {
@@ -20,7 +20,7 @@ Vagrant.configure("2") do |config|
       workerk8s.vm.box = "ubuntu/bionic64"
       workerk8s.vm.hostname = "workernode#{i}"
       workerk8s.vm.network "private_network", ip: "192.168.88.10#{i}"
-      workerk8s.vm.synced_folder "./", "/var/www/vagrant"
+      workerk8s.vm.synced_folder "../", "/var/www/vagrant"
       workerk8s.vm.provision "ansible_local" do |ansible|
         ansible.playbook = "playbook-workerkube.yml"
         ansible.extra_vars = {
@@ -30,7 +30,7 @@ Vagrant.configure("2") do |config|
     end
   end
 
-  config.vm.provision "shell", path: "script.sh"
+  config.vm.provision "shell", path: "../script.sh"
   config.vm.provider "virtualbox" do |vb|
       vb.cpus = 2
       vb.memory = "2048"

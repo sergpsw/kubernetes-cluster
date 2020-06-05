@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: masterk8s
   become: yes
   tasks:
   - name: Check Version OS
@@ -40,8 +40,7 @@
       notify:
         - docker status
     when: ansible_os_family == "Debian"
-    #
-    
+
   - name: Check Version OS
     block: # For Redhat
     - name: Install yum utils
@@ -75,30 +74,24 @@
         state: started
         enabled: yes
     when: ansible_os_family == "RedHat"
-    #
 
-  - name: Check Version OS
-    block: # For Debian and Redhat
-    - name: Add vagrant user to docker group
-      user:
-        name: vagrant
-        group: docker
+  - name: Add vagrant user to docker group
+    user:
+      name: vagrant
+      group: docker
 
-    - name: Remove swapfile from /etc/fstab
-      mount:
-        name: "{{ item }}"
-        fstype: swap
-        state: absent
-      with_items:
-      - swap
-      - none
+  - name: Remove swapfile from /etc/fstab
+    mount:
+      name: "{{ item }}"
+      fstype: swap
+      state: absent
+    with_items:
+    - swap
+    - none
 
-    - name: Disable swap
-      shell: swapoff -a
-      when: ansible_swaptotal_mb > 0
-
-    when: ansible_os_family == "Debian" or ansible_os_family == "RedHat"
-    #
+  - name: Disable swap
+    shell: swapoff -a
+    when: ansible_swaptotal_mb > 0
 
   - name: Check Version OS
     block: # For Debian
@@ -124,12 +117,11 @@
         - kubeadm 
         - kubectl
     when: ansible_os_family == "Debian"
-    #
 
   - name: Check Version OS
     block: # For Redhat
     - name: Disable SELinux
-      shell: setenforce 0
+      command: setenforce 0
 
     - name: Disable SELinux on reboot
       selinux:
@@ -157,14 +149,14 @@
 
     - name: Install kubelet
       yum:
-        name: kubelet
-        state: latest
-        update_cache: true
+          name: kubelet
+          state: latest
+          update_cache: true
 
     - name: Install kubeadm
       yum:
-        name: kubeadm
-        state: latest
+          name: kubeadm
+          state: latest
 
     - name: Install kubectl
       yum:
@@ -172,40 +164,42 @@
         state: latest
         allow_downgrade: yes
     when: ansible_os_family == "RedHat"
-    #
 
-  - name: Configure Node ip
+  - name: Configure node ip
     lineinfile:
       path: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
-      line: KUBELET_EXTRA_ARGS=--node-ip={{ node_ip }}
-    when: ansible_os_family == "Debian"
- 
-  - name: Check Version OS
-    block: # For Debian and Redhat
-    - name: Restart kubelet
-      service:
-        name: kubelet
-        daemon_reload: yes
-        state: restarted
-
-    - name: Copy the join command to server location
-      copy: src=join-command dest=/tmp/join-command.sh mode=0777
-
-    when: ansible_os_family == "Debian" or ansible_os_family == "RedHat"
-
-  - name: Join the node to cluster
-    shell: /tmp/join-command.sh
+      line: KUBELET_EXTRA_ARGS=--node-ip="192.168.88.100"
     when: ansible_os_family == "Debian"
 
-  - name: Join the node to cluster
-    shell: /tmp/join-command.sh --ignore-preflight-errors all
-    when: ansible_os_family == "RedHat"
+  - name: Restart kubelet
+    service:
+      name: kubelet
+      daemon_reload: yes
+      state: restarted
 
-  - name: Brake if OS non Debian or RedHat family
-    debug: msg="Sorry, not works for this OS family!"
-    when: ansible_os_family != "Debian" and ansible_os_family != "RedHat"
+  - name: Initialize the cluster
+    shell: kubeadm init --apiserver-advertise-address="192.168.88.100" --apiserver-cert-extra-sans="192.168.88.100"  --node-name masterk8s --pod-network-cidr=192.168.0.0/16
+
+  - name: Create .kube directory
+    become: yes
+    become_user: vagrant
+    file:
+      path: $HOME/.kube
+      state: directory
+      mode: 0755
+
+  - name: Copy admin.conf to user's kube config
+    copy:
+      src: /etc/kubernetes/admin.conf
+      dest: /home/vagrant/.kube/config
+      remote_src: yes
+      owner: vagrant
+
+  - name: Install Network Pods
+    become: yes
+    become_user: vagrant
+    shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 
   handlers:
   - name: docker status
     service: name=docker state=started
-
