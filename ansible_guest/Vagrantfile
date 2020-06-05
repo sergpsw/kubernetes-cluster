@@ -9,6 +9,7 @@ Vagrant.configure("2") do |config|
     masterk8s.vm.synced_folder "../", "/var/www/vagrant"
     masterk8s.vm.provision "ansible_local" do |ansible|
       ansible.playbook = "playbook-masterkube.yml"
+      ansible.version = "2.9.9"
       ansible.extra_vars = {
         node_ip: "192.168.88.100",
       }
@@ -23,6 +24,7 @@ Vagrant.configure("2") do |config|
       workerk8s.vm.synced_folder "../", "/var/www/vagrant"
       workerk8s.vm.provision "ansible_local" do |ansible|
         ansible.playbook = "playbook-workerkube.yml"
+        ansible.version = "2.9.9"
         ansible.extra_vars = {
           node_ip: "192.168.88.10#{i}",
         }
