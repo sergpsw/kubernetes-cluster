@@ -1,8 +1,6 @@
 .git
 .gitignore
 .vagrant
-ansible_guest/ubuntu-bionic-18.04-cloudimg-console.log
-ansible_guest/.vagrant
-ansible_guest/.join-command
-ansible_host/.vagrant
-ansible_host/.join-command
+.join-comman
+.env
+ubuntu-bionic-18.04-cloudimg-console.log

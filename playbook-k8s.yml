@@ -1,7 +1,11 @@
 ---
-- hosts: masterk8s
+- hosts: all
   become: yes
   tasks:
+  - name: Brake if OS non Debian or RedHat family
+    fail: msg="Not works for this OS family!"
+    when: ansible_os_family != "Debian" and ansible_os_family != "RedHat"
+
   - name: Check Version OS
     block: # For Debian
     - name: Install packages that allow apt to be used over HTTPS
@@ -168,9 +172,20 @@
   - name: Configure node ip
     lineinfile:
       path: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
-      line: KUBELET_EXTRA_ARGS=--node-ip="192.168.88.100"
+      line: KUBELET_EXTRA_ARGS=--node-ip={{ node_ip }}
     when: ansible_os_family == "Debian"
 
+  handlers:
+  - name: docker status
+    service: name=docker state=started
+
+
+- hosts: masterk8s
+  become: yes
+  vars:
+    src: /var/www/vagrant/
+    dest: /home/vagrant/
+  tasks:
   - name: Restart kubelet
     service:
       name: kubelet
@@ -178,7 +193,7 @@
       state: restarted
 
   - name: Initialize the cluster
-    shell: kubeadm init --apiserver-advertise-address="192.168.88.100" --apiserver-cert-extra-sans="192.168.88.100"  --node-name masterk8s --pod-network-cidr=192.168.0.0/16
+    shell: kubeadm init --apiserver-advertise-address={{ node_ip }} --apiserver-cert-extra-sans={{ node_ip }}  --node-name masterk8s --pod-network-cidr=192.168.0.0/16
 
   - name: Create .kube directory
     become: yes
@@ -195,11 +210,48 @@
       remote_src: yes
       owner: vagrant
 
-  - name: Install Network Pods
+  - name: Generate join command
+    shell: kubeadm token create --print-join-command
+    register: join_command
+
+  - name: Copy join command to local file
+    local_action: copy content="{{ join_command.stdout_lines[0] }}" dest="./join-command"
+
+  - name: Copy manifest-files
+    copy: src={{ src }}{{ item }} dest={{ dest }} remote_src=yes owner=vagrant
+    loop:
+    - "kube-flannel.yml"
+    - "nginx-deployment.yml"
+    - "nginx-ingress.yml"
+
+  - name: Install Pods
     become: yes
     become_user: vagrant
-    shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+    shell: kubectl apply -f kube-flannel.yml -f nginx-deployment.yml -f nginx-ingress.yml >> pods_setup.txt
+    args:
+      chdir: $HOME
+      creates: pods_setup.txt
 
-  handlers:
-  - name: docker status
-    service: name=docker state=started
+
+- hosts: workerk8s*
+  become: yes
+  tasks:
+  - name: Restart kubelet
+    service:
+      name: kubelet
+      daemon_reload: yes
+      state: restarted
+
+  - name: Copy the join command to server location
+    copy: src=join-command dest=/tmp/join-command.sh mode=0777
+
+  - name: Join the node to cluster (Debian)
+    shell: /tmp/join-command.sh
+    when: ansible_os_family == "Debian"
+
+  - name: Join the node to cluster (RedHat)
+    shell: |
+      kubeadm reset -f
+      echo -n " --ignore-preflight-errors=all"  >> /tmp/join-command.sh
+      sh /tmp/join-command.sh
+    when: ansible_os_family == "RedHat"
