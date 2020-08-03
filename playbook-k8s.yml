@@ -214,7 +214,7 @@
   - name: Install HAProxy
     package:
       name: haproxy
-      state: present
+      state: latest
 
   - name: Copy configure HAProxy
     copy: src=/var/www/vagrant/haproxy/haproxy.cfg.j2 dest=/etc/haproxy/haproxy.cfg remote_src=yes owner=vagrant
@@ -237,7 +237,7 @@
   - name: Install Pods
     become: yes
     become_user: vagrant
-    shell: kubectl apply -f kube-flannel.yml >> pods_setup.txt
+    shell: kubectl apply -f kube-flannel.yml -f nginx-deployment.yml >> pods_setup.txt
     args:
       chdir: $HOME
       creates: pods_setup.txt
