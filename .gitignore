@@ -1,7 +1,6 @@
 .git
 .gitignore
 .vagrant
-.vagrant/rgloader/
 .env
 join-command
 ubuntu-bionic-18.04-cloudimg-console.log
