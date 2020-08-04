@@ -1,4 +1,5 @@
 ---
+
 - hosts: all
   become: yes
   tasks:
@@ -183,7 +184,7 @@
 - hosts: masterk8s
   become: yes
   vars:
-    src: /var/www/vagrant/
+    src: /var/www/vagrant/manifests/
     dest: /home/vagrant/
   tasks:
   - name: Restart kubelet
@@ -210,6 +211,15 @@
       remote_src: yes
       owner: vagrant
 
+  - name: Install HAProxy
+    package:
+      name: haproxy=1.8.8-1ubuntu0.11
+      state: present
+
+  - name: Copy configure HAProxy
+    copy: src=/var/www/vagrant/haproxy/haproxy.cfg.j2 dest=/etc/haproxy/haproxy.cfg remote_src=yes owner=vagrant
+    notify: restart haproxy
+
   - name: Generate join command
     shell: kubeadm token create --print-join-command
     register: join_command
@@ -222,16 +232,18 @@
     loop:
     - "kube-flannel.yml"
     - "nginx-deployment.yml"
-    - "nginx-ingress.yml"
 
   - name: Install Pods
     become: yes
     become_user: vagrant
-    shell: kubectl apply -f kube-flannel.yml -f nginx-deployment.yml -f nginx-ingress.yml >> pods_setup.txt
+    shell: kubectl apply -f kube-flannel.yml >> pods_setup.txt
     args:
       chdir: $HOME
       creates: pods_setup.txt
 
+  handlers:
+  - name: restart haproxy
+    service: name=haproxy state=restarted
 
 - hosts: workerk8s*
   become: yes
