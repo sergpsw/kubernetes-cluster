@@ -109,18 +109,24 @@
       apt_repository:
         repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
         state: present
-        filename: kubernetes.list
+        filename: 'kubernetes'
 
-    - name: Install Kubernetes binaries
-      apt: 
-        name: "{{ packages }}"
+    - name: Install Kubelet
+      apt:
+        name: kubelet=1.15.0-00
         state: present
-        update_cache: yes
-      vars:
-        packages:
-        - kubelet
-        - kubeadm 
-        - kubectl
+        update_cache: true
+
+    - name: Install Kubeadm
+      apt:
+        name: kubeadm=1.15.0-00
+        state: present
+
+    - name: Install Kubectl
+      apt:
+        name: kubectl=1.15.0-00
+        state: present
+        force: yes
     when: ansible_os_family == "Debian"
 
   - name: Check Version OS
@@ -154,19 +160,19 @@
 
     - name: Install kubelet
       yum:
-          name: kubelet
-          state: latest
+          name: kubelet-1.14.0
+          state: present
           update_cache: true
 
     - name: Install kubeadm
       yum:
-          name: kubeadm
-          state: latest
+          name: kubelet-1.14.0
+          state: present
 
     - name: Install kubectl
       yum:
-        name: kubectl
-        state: latest
+        name: kubelet-1.14.0
+        state: present
         allow_downgrade: yes
     when: ansible_os_family == "RedHat"
 
@@ -232,6 +238,7 @@
     loop:
     - "kube-flannel.yml"
     - "nginx-deployment.yml"
+    - "ingress-nginx.yml"
 
   - name: Install Pods
     become: yes
