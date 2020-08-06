@@ -62,7 +62,8 @@ metadata:
   name: ing-nginx
   namespace: ns-nginx
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /  
+    nginx.ingress.kubernetes.io/rewrite-target: / 
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
   tls:
   - hosts:
