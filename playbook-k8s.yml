@@ -238,11 +238,14 @@
     loop:
     - "kube-flannel.yml"
     - "nginx-deployment.yml"
+    - "ingress-controller-nginx.yml"
+    - "apache-application.yml"
+
 
   - name: Install Pods
     become: yes
     become_user: vagrant
-    shell: kubectl apply -f kube-flannel.yml >> pods_setup.txt
+    shell: kubectl apply -f kube-flannel.yml -f ingress-controller-nginx.yml >> pods_setup.txt
     args:
       chdir: $HOME
       creates: pods_setup.txt
