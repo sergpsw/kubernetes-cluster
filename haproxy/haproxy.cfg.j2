@@ -35,3 +35,29 @@ defaults
 	errorfile 502 /etc/haproxy/errors/502.http
 	errorfile 503 /etc/haproxy/errors/503.http
 	errorfile 504 /etc/haproxy/errors/504.http
+	option httpclose #
+
+frontend http
+    mode tcp
+    bind *:80
+    option tcplog
+    default_backend http
+
+frontend https
+    mode tcp
+    bind *:443
+    option tcplog
+    default_backend https
+
+backend http
+    balance roundrobin
+    mode tcp
+    server masternode 192.168.88.100:32080 check
+	# server masternode2 192.168.88.101:32080 check
+
+backend https
+    balance roundrobin
+    mode tcp
+    option ssl-hello-chk
+    server masternode 192.168.88.100:32443 check
+	# server masternode2 192.168.88.101:32443 check
