@@ -17,3 +17,6 @@ Use the following instruction to deploy Kubernetes cluster.
 7. Wait the virtual machines starts up. Upon completion of all the above steps, the Kubernetes cluster should be up and running:
  - `vagrant ssh masterk8s` - can login to the master nodes
  - `vagrant ssh workerk8s1` - can login to the worker nodes
+8. Add in '/etc/hosts' line "192.168.88.100 test.loc".
+ - http://test.loc:32080 - open in the browser webserver Apache.
+ - https://test.loc:32443 - open in the browser webserver Apache.
