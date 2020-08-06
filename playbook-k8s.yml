@@ -239,13 +239,13 @@
     - "kube-flannel.yml"
     - "nginx-deployment.yml"
     - "ingress-controller-nginx.yml"
-    - "ingress-apache.yml"
+    - "apache-application.yml"
 
 
   - name: Install Pods
     become: yes
     become_user: vagrant
-    shell: kubectl apply -f kube-flannel.yml -f ingress-controller-nginx.yml -f ingress-apache.yml >> pods_setup.txt
+    shell: kubectl apply -f kube-flannel.yml -f ingress-controller-nginx.yml >> pods_setup.txt
     args:
       chdir: $HOME
       creates: pods_setup.txt
