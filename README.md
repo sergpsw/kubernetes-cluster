@@ -14,9 +14,18 @@ Use the following instruction to deploy Kubernetes cluster.
 
 6. Run the command `vagrant up`. 
 
-7. Wait the virtual machines starts up. Upon completion of all the above steps, the Kubernetes cluster should be up and running:
- - `vagrant ssh masterk8s` - can login to the master nodes
- - `vagrant ssh workerk8s1` - can login to the worker nodes
-8. Add in '/etc/hosts' line "192.168.88.100 test.loc".
- - http://test.loc:32080 - open in the browser webserver Apache.
- - https://test.loc:32443 - open in the browser webserver Apache.
+7. Add in '/etc/hosts' lines: "192.168.88.100 test.loc", "192.168.88.100 wp.loc".
+
+8. Wait the virtual machines starts up. Upon completion of all the above steps, the Kubernetes cluster should be up and running:
+  - `vagrant ssh masterk8s` - can login to the master nodes
+
+    After execution 'kubectl apply -f apache-application.yml' will be available:
+    - http://test.loc - open in the browser webserver Apache.
+    - https://test.loc - open in the browser webserver Apache.
+
+    After execution 'kubectl apply -f wordpress-mysql.yml' will be available:
+    - http://wp.loc - open in the browser Wordpress.
+    - https://wp.loc - open in the browser Wordpress.
+
+  - `vagrant ssh workerk8s1` - can login to the worker nodes.
+
