@@ -1,0 +1,82 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: wordpress-ns
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress
+  namespace: wordpress-ns
+  labels:
+    app: wordpress
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+    name: http
+  selector:
+    app: wordpress
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress
+  namespace: wordpress-ns
+  labels:
+    app: wordpress
+spec:
+  selector:
+    matchLabels:
+      app: wordpress
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: wordpress
+    spec:
+      containers:
+        - image: wordpress:4.9-php7.2-apache 
+          name: wordpress
+          env:
+          - name: WORDPRESS_DB_HOST
+            value: mysql-db.mysql-ns.svc.cluster.local
+          - name: MYSQL_ROOT_PASSWORD
+            value: password
+          - name: MYSQL_DATABASE
+            value: mysql
+          ports:
+            - containerPort: 80
+              name: wordpress
+          volumeMounts:
+            - name: wordpress
+              mountPath: /var/www/html
+      volumes:
+        - name: wordpress
+          emptyDir: {}
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress 
+metadata: 
+  name: ing-wp
+  namespace: wordpress-ns
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: / 
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  tls:
+  - hosts:
+    - wp.loc
+  rules:
+  - host: wp.loc
+    http:
+      paths:
+      - backend:
+          serviceName: wordpress
+          servicePort: 80

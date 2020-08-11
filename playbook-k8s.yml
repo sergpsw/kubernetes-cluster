@@ -236,17 +236,18 @@
   - name: Copy manifest-files
     copy: src={{ src }}{{ item }} dest={{ dest }} remote_src=yes owner=vagrant
     loop:
-    - "kube-flannel.yml"
+    - "calico.yml"
     - "nginx-deployment.yml"
     - "ingress-controller-nginx.yml"
     - "apache-application.yml"
-    - "wordpress-mysql.yml"
+    - "mysql-deployment.yml"
+    - "wordpress-deployment.yml"
 
 
   - name: Install Pods
     become: yes
     become_user: vagrant
-    shell: kubectl apply -f kube-flannel.yml -f ingress-controller-nginx.yml >> pods_setup.txt
+    shell: kubectl apply -f calico.yml -f ingress-controller-nginx.yml >> pods_setup.txt
     args:
       chdir: $HOME
       creates: pods_setup.txt
