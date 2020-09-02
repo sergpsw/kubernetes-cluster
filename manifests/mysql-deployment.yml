@@ -5,6 +5,43 @@ metadata:
   name: mysql-ns
 
 ---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: mysql-sc
+  namespace: mysql-ns
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: mysql-pvc
+#   namespace: mysql-ns
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   storageClassName: mysql-sc
+#   resources:
+#     requests:
+#       storage: 2Gi
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-local-provisioner-config
+  namespace: kube-system #
+data:
+  nodeLabelsForPV: |
+    - kubernetes.io/hostname
+  storageClassMap: |
+    mysql-sc:
+      hostDir: /var/www/vagrant/
+      mountDir: /var/www/vagrant/
+
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -43,13 +80,22 @@ spec:
     spec:
       containers:
       - image:  mysql:5.7
-        name: mysql
+        name: mysql # db_name
         env:
+        # - name: MYSQL_ROOT_PASSWORD
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: mysql-pass
+        #       key: password
         - name: MYSQL_ROOT_PASSWORD
           value: password
         volumeMounts:
-        - name: db-folder
-          mountPath: /var/lib/mysql
+        - name: mysql-persistent-storage
+          mountPath: /var/www/vagrant/
+          mountPropagation: "HostToContainer"
       volumes:
-        - name: db-folder
-          emptyDir: {}
+      - name: mysql-persistent-storage
+        hostPath:
+          path: /var/www/vagrant/
+        # persistentVolumeClaim:
+        #   claimName: mysql-pvc
