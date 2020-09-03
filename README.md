@@ -23,7 +23,7 @@ Use the following instruction to deploy Kubernetes cluster.
     - http://test.loc - open in the browser webserver Apache.
     - https://test.loc - open in the browser webserver Apache.
 
-    After execution 'kubectl apply -f mysql-deployment.yml' later 'kubectl apply -f wordpress-deployment.yml' - will be available:
+    After execution 'kubectl create secret generic my-special-secret', later 'kubectl apply -f mysql-deployment.yml', later 'kubectl apply -f wordpress-deployment.yml' - will be available:
     - http://wp.loc - open in the browser Wordpress.
     - https://wp.loc - open in the browser Wordpress.
 

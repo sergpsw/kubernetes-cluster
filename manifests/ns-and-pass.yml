@@ -1,0 +1,31 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mysql-ns
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: wordpress-ns
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-pass
+  namespace: mysql-ns
+type: Opaque
+stringData:
+  password: PASSWORD
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-passw
+  namespace: wordpress-ns
+type: Opaque
+stringData:
+  password: PASSWORD
