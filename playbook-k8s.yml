@@ -240,6 +240,8 @@
     - "nginx-deployment.yml"
     - "ingress-controller-nginx.yml"
     - "apache-application.yml"
+    - "mysql-deployment.yml"
+    - "wordpress-deployment.yml"
 
 
   - name: Install Pods
