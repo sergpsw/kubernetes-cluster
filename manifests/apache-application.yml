@@ -71,10 +71,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - devopscert.ga
+    - app.devopscert.ga
     secretName: letsencrypt
   rules:
-  - host: devopscert.ga
+  - host: app.devopscert.ga
     http:
       paths:
       - backend:
