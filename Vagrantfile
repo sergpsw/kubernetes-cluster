@@ -11,10 +11,8 @@ Vagrant.configure("2") do |config|
   config.vm.define "masterk8s" do |masterk8s|
     masterk8s.vm.box = "ubuntu/bionic64"
     masterk8s.vm.hostname = "masternode"
-    masterk8s.vm.network "forwarded_port", guest: 53, host: 53,  protocol: "udp"
-    masterk8s.vm.network "forwarded_port", guest: 8081, host: 8081
     masterk8s.vm.network "private_network", ip: "192.168.88.100"
-    masterk8s.vm.network "public_network", bridge: "wlp3s0", ip: "192.168.0.222"
+    masterk8s.vm.network "public_network", bridge: "", ip: "192.168.0.222"
     masterk8s.vm.synced_folder "./", "/var/www/vagrant"
     masterk8s.vm.provision "ansible_local" do |ansible|
       ansible.playbook = "playbook-k8s.yml"

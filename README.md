@@ -12,7 +12,7 @@ Use the following instruction to deploy Kubernetes cluster.
 
 5. Can change number Worker Nodes in `.env`.
 
-6. Run the command `vagrant up`. 
+6. Run the command `vagrant up`, select bridged network interfaces.
 
 7. Wait the virtual machines starts up. Upon completion of all the above steps, the Kubernetes cluster should be up and running `vagrant ssh masterk8s` - can login to the master nodes:
   - If execution 'kubectl apply -f apache-application.yml' will be available: https://app.devopscert.ga/ - open in the browser webserver Apache.
