@@ -12,20 +12,8 @@ Use the following instruction to deploy Kubernetes cluster.
 
 5. Can change number Worker Nodes in `.env`.
 
-6. Run the command `vagrant up`. 
+6. Run the command `vagrant up`, select bridged network interfaces.
 
-7. Add in '/etc/hosts' lines: "192.168.88.100 test.loc", "192.168.88.100 wp.loc".
-
-8. Wait the virtual machines starts up. Upon completion of all the above steps, the Kubernetes cluster should be up and running:
-  - `vagrant ssh masterk8s` - can login to the master nodes
-
-    After execution 'kubectl apply -f apache-application.yml' will be available:
-    - http://test.loc - open in the browser webserver Apache.
-    - https://test.loc - open in the browser webserver Apache.
-
-    After execution 'kubectl create secret generic my-special-secret', later 'kubectl apply -f mysql-deployment.yml', later 'kubectl apply -f wordpress-deployment.yml' - will be available:
-    - http://wp.loc - open in the browser Wordpress.
-    - https://wp.loc - open in the browser Wordpress.
-
-  - `vagrant ssh workerk8s1` - can login to the worker nodes.
-
+7. Wait the virtual machines starts up. Upon completion of all the above steps, the Kubernetes cluster should be up and running `vagrant ssh masterk8s` - can login to the master nodes:
+  - If execution 'kubectl apply -f apache-application.yml' will be available: https://app.devopscert.ga/ - open in the browser webserver Apache.
+  - If execution 'kubectl create secret generic my-special-secret', later 'kubectl apply -f mysql-deployment.yml', later 'kubectl apply -f wordpress-deployment.yml' - will be available: https://devopscert.ga/ - open in the browser Wordpress.

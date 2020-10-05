@@ -200,7 +200,7 @@
       state: restarted
 
   - name: Initialize the cluster
-    shell: kubeadm init --apiserver-advertise-address={{ node_ip }} --apiserver-cert-extra-sans={{ node_ip }}  --node-name masterk8s --pod-network-cidr=192.168.0.0/16
+    shell: kubeadm init --apiserver-advertise-address={{ node_ip }} --apiserver-cert-extra-sans={{ node_ip }}  --node-name masterk8s --pod-network-cidr=10.244.0.0/16
 
   - name: Create .kube directory
     become: yes
@@ -237,8 +237,10 @@
     copy: src={{ src }}{{ item }} dest={{ dest }} remote_src=yes owner=vagrant
     loop:
     - "kube-flannel.yml"
-    - "nginx-deployment.yml"
     - "ingress-controller-nginx.yml"
+    - "cert-manager-legacy.yml"
+    - "ns-and-pass.yml"
+    - "le-issuer.yml"
     - "apache-application.yml"
     - "mysql-deployment.yml"
     - "wordpress-deployment.yml"
@@ -247,7 +249,7 @@
   - name: Install Pods
     become: yes
     become_user: vagrant
-    shell: kubectl apply -f kube-flannel.yml -f ingress-controller-nginx.yml >> pods_setup.txt
+    shell: kubectl apply -f kube-flannel.yml -f ingress-controller-nginx.yml -f cert-manager-legacy.yml -f ns-and-pass.yml -а le-issuer.yml >> pods_setup.txt
     args:
       chdir: $HOME
       creates: pods_setup.txt
